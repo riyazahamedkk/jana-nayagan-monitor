@@ -6,8 +6,11 @@ from bs4 import BeautifulSoup
 URL = "https://in.bookmyshow.com/movies/bengaluru/jana-nayagan/buytickets/ET00430817/20260109"
 STATE_FILE = "state.json"
 
-PUSHOVER_USER = os.environ["PUSHOVER_USER"]
-PUSHOVER_TOKEN = os.environ["PUSHOVER_TOKEN"]
+PUSHOVER_USER = os.getenv("PUSHOVER_USER")
+PUSHOVER_TOKEN = os.getenv("PUSHOVER_TOKEN")
+
+if not PUSHOVER_USER or not PUSHOVER_TOKEN:
+    raise RuntimeError("Pushover secrets not found. Check GitHub Actions secrets.")
 
 def send_pushover(msg):
     requests.post(
