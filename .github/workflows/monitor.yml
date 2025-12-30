@@ -2,7 +2,7 @@ name: Jana Nayagan Monitor
 
 on:
   schedule:
-    - cron: "* * * * *"   # runs every 1 minute
+    - cron: "* * * * *"   # every 1 minute
   workflow_dispatch:
 
 jobs:
@@ -26,5 +26,6 @@ jobs:
         env:
           PUSHOVER_USER: ${{ secrets.PUSHOVER_USER }}
           PUSHOVER_TOKEN: ${{ secrets.PUSHOVER_TOKEN }}
-        run: |
-          python monitor.py
+          # 🔴 FOR TEST ONLY — set to "1" once, then REMOVE
+          # TEST_NOTIFY: "1"
+        run: python monitor.py
