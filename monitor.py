@@ -10,22 +10,29 @@ PUSHOVER_USER = os.getenv("PUSHOVER_USER")
 PUSHOVER_TOKEN = os.getenv("PUSHOVER_TOKEN")
 
 if not PUSHOVER_USER or not PUSHOVER_TOKEN:
-    raise RuntimeError(
-        "❌ Pushover secrets not found. "
-        "Check Repository → Settings → Secrets → Actions"
-    )
+    raise RuntimeError("Pushover secrets not found. Check GitHub Actions secrets.")
 
-def send_pushover(msg):
+def send_pushover(title, message):
     requests.post(
         "https://api.pushover.net/1/messages.json",
         data={
             "token": PUSHOVER_TOKEN,
             "user": PUSHOVER_USER,
-            "message": msg,
-            "title": "🎬 Jana Nayagan Alert",
+            "title": title,
+            "message": message,
             "priority": 1
-        }
+        },
+        timeout=20
     )
+
+# 🧪 TEST MODE (manual trigger)
+if os.getenv("TEST_NOTIFY") == "1":
+    send_pushover(
+        "🧪 Test Alert",
+        "This is a TEST notification.\nYour alerts are working correctly."
+    )
+    print("Test notification sent")
+    exit(0)
 
 def get_shows():
     r = requests.get(URL, timeout=20)
@@ -41,26 +48,25 @@ def get_shows():
     return sorted(shows)
 
 def main():
-    shows = get_shows()
+    current_shows = get_shows()
 
     if not os.path.exists(STATE_FILE):
         with open(STATE_FILE, "w") as f:
-            json.dump(shows, f)
+            json.dump(current_shows, f)
+        print("Baseline created")
         return
 
     with open(STATE_FILE) as f:
-        old = json.load(f)
+        old_shows = json.load(f)
 
-    if len(shows) > len(old):
+    if len(current_shows) > len(old_shows):
         send_pushover(
-            f"🚨 NEW SHOWS ADDED!\n\n"
-            f"Old: {len(old)}\n"
-            f"New: {len(shows)}\n\n"
-            f"Open BookMyShow now!"
+            "🚨 New Shows Added!",
+            f"New showtimes detected.\n\nOld: {len(old_shows)}\nNew: {len(current_shows)}\n\nOpen BookMyShow now!"
         )
 
     with open(STATE_FILE, "w") as f:
-        json.dump(shows, f)
+        json.dump(current_shows, f)
 
 if __name__ == "__main__":
     main()
