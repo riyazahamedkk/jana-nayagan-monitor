@@ -10,7 +10,10 @@ PUSHOVER_USER = os.getenv("PUSHOVER_USER")
 PUSHOVER_TOKEN = os.getenv("PUSHOVER_TOKEN")
 
 if not PUSHOVER_USER or not PUSHOVER_TOKEN:
-    raise RuntimeError("Pushover secrets not found. Check GitHub Actions secrets.")
+    raise RuntimeError(
+        "❌ Pushover secrets not found. "
+        "Check Repository → Settings → Secrets → Actions"
+    )
 
 def send_pushover(msg):
     requests.post(
